@@ -15,6 +15,24 @@ jobs:
       pull-requests: write
 
     steps: 
+      - name: Reminder to run full CI on PR
+        uses: actions/github-script@v7
+        env:
+          REPOSITORY: ${{ github.repository }}
+          CONTRIBUTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          script: |
+            const { REPOSITORY, CONTRIBUTOR } = process.env
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `👋 Hi ${CONTRIBUTOR}! Thank you for contributing to ${REPOSITORY}.\n\n` +
+                'Just a reminder: The `NVIDIA Test Github Validation` CI runs an essential subset of the testing framework to quickly catch errors.' +
+                'Your PR reviewers may elect to test the changes comprehensively before approving your changes.\n\n' +
+                '🚀'
+            })
       - name: Adding Label
         uses: actions/github-script@v7
         env:
