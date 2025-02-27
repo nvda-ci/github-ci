@@ -1,4 +1,4 @@
-name: Label PRs from external contributors
+name: Acknowledge PRs from external contributors
 
 on:
   pull_request_target:
