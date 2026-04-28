@@ -115,7 +115,7 @@ jobs:
         id: calculate-target-tag
         shell: bash
         env:
-          ECR_REPOSITORY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/ai-dynamo/dynamo
+          ECR_REPOSITORY: dynamo
         run: |
           
           if [[ "${{ matrix.version_selector }}" == "cpu" ]] || [[ "${{ inputs.target_tag_plain }}" == *"planner"* ]]; then

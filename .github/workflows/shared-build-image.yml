@@ -192,8 +192,8 @@ jobs:
           IMAGE_TAG=${{ github.sha }}-${TAG_BUILDER}${IMAGE_TAG_SUFFIX}
           TEST_IMAGE_TAG=${{ github.sha }}-${TAG_BUILDER}${IMAGE_TAG_SUFFIX}-test
 
-          IMAGE_URI="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/ai-dynamo/dynamo:${IMAGE_TAG}"
-          TEST_IMAGE_URI="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/ai-dynamo/dynamo:${TEST_IMAGE_TAG}"
+          IMAGE_URI="dynamo:${IMAGE_TAG}"
+          TEST_IMAGE_URI="dynamo:${TEST_IMAGE_TAG}"
           echo "target_tag_plain=${TARGET_TAG_PLAIN}" >> $GITHUB_OUTPUT
           echo "image_uri=${IMAGE_URI}" >> $GITHUB_OUTPUT
           echo "test_image_uri=${TEST_IMAGE_URI}" >> $GITHUB_OUTPUT
@@ -221,12 +221,11 @@ jobs:
         env:
           EXTRA_TAGS: ${{ inputs.extra_tags }}
         run: |
-          ECR_REGISTRY="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com"
           RESULT=""
           if [ -n "$EXTRA_TAGS" ]; then
             while IFS= read -r tag; do
               if [ -n "$tag" ]; then
-                RESULT+="${ECR_REGISTRY}/ai-dynamo/dynamo:${tag}"$'\n'
+                RESULT+="dynamo:${tag}"$'\n'
               fi
             done <<< "$EXTRA_TAGS"
           fi
@@ -311,18 +310,8 @@ jobs:
       - name: Build and Push Test Image
         if: ${{ inputs.target != 'dev' }}
         shell: bash
-        env:
-          ECR_HOSTNAME: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com
         run: |
-          PLAIN_TAG="${{ steps.calculate-target-tag.outputs.target_tag_plain }}"
-          CACHE_TAG="test-${PLAIN_TAG}-cache"
-          CACHE_ARGS="--cache-from type=registry,ref=${ECR_HOSTNAME}/ai-dynamo/dynamo:main-${CACHE_TAG}"
-          CACHE_ARGS+=" --cache-from type=registry,ref=${ECR_HOSTNAME}/ai-dynamo/dynamo:release-${CACHE_TAG}"
-          if [[ "$GITHUB_REF_NAME" == "main" ]]; then
-            CACHE_ARGS+=" --cache-to type=registry,ref=${ECR_HOSTNAME}/ai-dynamo/dynamo:main-${CACHE_TAG},mode=max"
-          elif [[ "$GITHUB_REF_NAME" =~ ^release ]]; then
-            CACHE_ARGS+=" --cache-to type=registry,ref=${ECR_HOSTNAME}/ai-dynamo/dynamo:release-${CACHE_TAG},mode=max"
-          fi
+          CACHE_ARGS=""
 
           PUSH_ARGS=""
           if [ "${{ inputs.push_image }}" == "true" ]; then
