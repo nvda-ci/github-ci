@@ -196,7 +196,7 @@ jobs:
       use_sccache: false
       push_image: false
       dynamo_repo: VincyZhang/dynamo
-      dynamo_ref: enbale_xpu_ci
+      dynamo_ref: enable_more_xpu_test
     secrets: inherit
 
   vllm-dev-build:

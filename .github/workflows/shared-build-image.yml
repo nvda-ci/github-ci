@@ -106,7 +106,7 @@ on:
         description: 'Git ref (branch/tag/sha) of the dynamo repo to checkout'
         required: false
         type: string
-        default: 'enbale_xpu_ci'
+        default: 'enable_more_xpu_test'
     secrets:
       AWS_DEFAULT_REGION:
         required: false
